@@ -1,0 +1,6 @@
+@ByteTech.Presentation_HostAddress = http://localhost:5296
+
+GET {{ByteTech.Presentation_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
