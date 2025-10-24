@@ -18,40 +18,9 @@ public class UserRepository(MongoDbContext context) : IUserRepository
         return await _collection.Find(u => u.Email == email).FirstOrDefaultAsync();
     }
 
-    public async Task<(int totalCount, List<User> data)> GetPagedAsync(int pageIndex, int pageSize, string? keyword)
-    {
-        var filter = Builders<User>.Filter.Empty;
-
-        if (!string.IsNullOrWhiteSpace(keyword))
-        {
-            keyword = keyword.Trim();
-            filter = Builders<User>.Filter.Or(
-                Builders<User>.Filter.Regex(u => u.FullName, new MongoDB.Bson.BsonRegularExpression(keyword, "i")),
-                Builders<User>.Filter.Regex(u => u.Email, new MongoDB.Bson.BsonRegularExpression(keyword, "i"))
-            );
-        }
-
-        var totalCount = (int)await _collection.CountDocumentsAsync(filter);
-
-        var data = await _collection
-            .Find(filter)
-            .SortByDescending(u => u.CreatedAt)
-            .Skip((pageIndex - 1) * pageSize)
-            .Limit(pageSize)
-            .ToListAsync();
-
-        return (totalCount, data);
-    }
-
     public async Task UpdateAsync(User user)
     {
-        var update = Builders<User>.Update
-            .Set(u => u.FullName, user.FullName)
-            .Set(u => u.Email, user.Email)
-            .Set(u => u.IsLocked, user.IsLocked)
-            .Set(u => u.UpdatedAt, DateTime.UtcNow);
-
-        await _collection.UpdateOneAsync(u => u.Id == user.Id, update);
+        await _collection.ReplaceOneAsync(p => p.Id == user.Id, user);
     }
 
     public async Task<User> GetByIdAsync(string id)
@@ -73,5 +42,10 @@ public class UserRepository(MongoDbContext context) : IUserRepository
     public async Task DeleteAsync(User entity)
     {
         await _collection.DeleteOneAsync(u => u.Id == entity.Id);
+    }
+
+    public User? GetByIdSync(string id)
+    {
+         return _collection.Find(u => u.Id == id).FirstOrDefault();
     }
 }

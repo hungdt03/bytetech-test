@@ -1,8 +1,9 @@
-using System;
+using ByteTech.Application.Events.Users.Created;
+using ByteTech.Application.Services.Elasticsearch;
 using ByteTech.Domain.Entities;
 using ByteTech.Domain.Enums;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 
@@ -14,6 +15,7 @@ public class Seeding
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<MongoDbContext>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var adminUser = await context.Users.FindAsync(u => u.Role == EUserRole.Admin);
         if (await adminUser.AnyAsync())
@@ -33,6 +35,8 @@ public class Seeding
             UpdatedAt = DateTime.UtcNow
         };
 
-        await context.Users.InsertOneAsync(admin);  
+        await context.Users.InsertOneAsync(admin);
+
+        await mediator.Publish(new UserCreatedEvent(admin));
     }
 }

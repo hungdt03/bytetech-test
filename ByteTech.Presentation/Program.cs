@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddServiceDependencies(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.ConfigureSwagger();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -16,17 +17,20 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
+builder.Services.AddEndpointsApiExplorer();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<MongoDbContext>();
     await Seeding.SeedAsync(scope.ServiceProvider);
 }
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();

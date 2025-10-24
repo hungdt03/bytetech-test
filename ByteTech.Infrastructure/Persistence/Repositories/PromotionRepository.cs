@@ -10,7 +10,7 @@ public class PromotionRepository(MongoDbContext context) : IPromotionRepository
 
     public async Task<Promotion?> GetByCodeAsync(string code)
     {
-        return await _collection.Find(p => p.Code == code && p.IsActive).FirstOrDefaultAsync();
+        return await _collection.Find(p => p.Code == code).FirstOrDefaultAsync();
     }
 
     public async Task<List<Promotion>> GetAllActiveAsync()
@@ -18,18 +18,29 @@ public class PromotionRepository(MongoDbContext context) : IPromotionRepository
         return await _collection.Find(p => p.IsActive).ToListAsync();
     }
 
-    public async Task CreateAsync(Promotion promotion)
-    {
-        await _collection.InsertOneAsync(promotion);
-    }
-
     public async Task UpdateAsync(Promotion promotion)
     {
         await _collection.ReplaceOneAsync(p => p.Id == promotion.Id, promotion);
     }
 
-    public async Task DeleteAsync(string id)
+    public async Task<Promotion> GetByIdAsync(string id)
     {
-        await _collection.DeleteOneAsync(p => p.Id == id);
+        return await _collection.Find(u => u.Id == id).FirstOrDefaultAsync();
+    }
+
+    public async Task<IEnumerable<Promotion>> GetAllAsync()
+    {
+        return await _collection.Find(_ => true).ToListAsync();
+    }
+
+    public async Task<Promotion> AddAsync(Promotion entity)
+    {
+        await _collection.InsertOneAsync(entity);
+        return entity;
+    }
+
+    public async Task DeleteAsync(Promotion entity)
+    {
+        await _collection.DeleteOneAsync(p => p.Id == entity.Id);
     }
 }

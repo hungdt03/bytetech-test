@@ -8,7 +8,5 @@ namespace ByteTech.Application.Mappers;
 public partial class UserMapper
 {
     [MapperIgnoreSource(nameof(User.PasswordHash))]
-    [MapperIgnoreSource(nameof(User.CreatedAt))]
-    [MapperIgnoreSource(nameof(User.UpdatedAt))]
     public partial UserResponse ToResponse(User user);
 }

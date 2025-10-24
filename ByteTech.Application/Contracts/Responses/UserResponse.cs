@@ -8,5 +8,7 @@ public record UserResponse
     string Email,
     string FullName,
     EUserRole Role,
-    bool IsLocked
+    bool IsLocked,
+    DateTime CreatedAt,
+    DateTime UpdatedAt
 );

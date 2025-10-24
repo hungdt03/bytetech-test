@@ -23,6 +23,8 @@ public static class ServiceCollectionExtension
         services.AddScoped<IPromotionUsageRepository, PromotionUsageRepository>();
 
         services.AddScoped<IUserElasticsearchService, UsersElasticsearchService>();
+        services.AddScoped<IPromotionElasticsearchService, PromotionElasticsearchService>();
+        services.AddScoped<IPromotionUsageElasticsearchService, PromotionUsageElasticsearchService>();
 
         services.AddSingleton<IElasticClient>(sp =>
         {
@@ -35,6 +37,10 @@ public static class ServiceCollectionExtension
         var jwtSettings = new JwtSettings();
         configuration.GetSection(nameof(JwtSettings)).Bind(jwtSettings);
         services.AddSingleton(jwtSettings);
+
+        var mongoDbSettings = new MongoDbSettings();
+        configuration.GetSection(nameof(MongoDbSettings)).Bind(mongoDbSettings);
+        services.AddSingleton(mongoDbSettings);
 
         return services;
     }

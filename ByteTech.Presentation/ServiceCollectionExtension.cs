@@ -4,6 +4,7 @@ using ByteTech.Application;
 using ByteTech.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace ByteTech.Presentation;
 
@@ -42,4 +43,40 @@ public static class ServiceCollectionExtension
 
         return services;
     }
+
+    public static void ConfigureSwagger(this IServiceCollection services) =>
+        services.AddSwaggerGen(options =>
+        {
+            // Define Swagger document
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "JWT Authentication API",
+                Version = "v1",
+            });
+
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Please enter a valid token",
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer",
+                        },
+                    },
+                    Array.Empty<string>()
+                },
+            });
+    });
 }

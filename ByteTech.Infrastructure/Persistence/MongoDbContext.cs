@@ -9,10 +9,10 @@ public class MongoDbContext
 {
     private readonly IMongoDatabase _database;
 
-    public MongoDbContext(IOptions<MongoDbSettings> settings)
+    public MongoDbContext(MongoDbSettings settings)
     {
-        var client = new MongoClient(settings.Value.ConnectionString);
-        _database = client.GetDatabase(settings.Value.DatabaseName);
+        var client = new MongoClient(settings.ConnectionString);
+        _database = client.GetDatabase(settings.DatabaseName);
     }
 
     public IMongoCollection<User> Users => _database.GetCollection<User>("Users");
